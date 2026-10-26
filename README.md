@@ -16,6 +16,8 @@ We initialized the model by splitting the data at its global mean. EM then repea
 
 ### Tracking the first iterations
 
+The assignment's table template labels the second group "Pros" and asks for "Basketball Player" probabilities. That wording comes from an earlier version of the task. We modelled **fathers and children**, so our groups are labelled **Child** (the shorter group) and **Father** (the taller group) throughout.
+
 | Iteration | μ1 (Child) | μ2 (Father) | σ²1 | σ²2 | π1 | π2 | Log-likelihood |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | 0 (initialization) | 64.2598 | 70.2147 | 4.1428 | 3.5711 | 0.5048 | 0.4952 | −3071.1165 |
@@ -73,11 +75,18 @@ For mean squared error `J = (1/n) Σ(ŷ − y)²`, the gradients are:
 
 | Update | Member | m after update | b after update | Cost after update |
 |---|---|---|---:|---:|
+| Start | — | [−1, 2] | 1 | 61 |
 | 1 | Erin | [−1.45, 0.87] | 0.88 | 6.845 |
 | 2 | Belyse | [−1.3316, 1.1808] | 0.9318 | 2.7238 |
 | 3 | Boaz | [−1.369562, 1.095182] | 0.93624 | 2.3904 |
 
-The cost goes down at each step, from **61** at the start to **2.3904** after three updates. The parameters move back and forth a little as they adjust, but the changes get smaller.
+### The trend in m and b
+
+**m2 changed the most.** It dropped from 2 to 0.87 in the first update, because x2 has the largest values (3 and 10), which gave it the largest gradient (∂J/∂m2 = 113). It then moved back up to 1.18 and settled at 1.10. **m1** went from −1 to −1.45, then to −1.33 and −1.37. **b** dipped from 1 to 0.88, then rose to 0.93 and 0.94.
+
+The values zigzag because the first update overshot. The predictions went from too high ([6, 17]) to too low ([2.04, 3.78]), so the gradients flipped sign and the next updates moved m and b back the other way. Each correction is smaller than the one before, so the values are settling.
+
+**Are they moving in a direction that reduces the error? Yes.** The cost falls after every update: **61 → 6.845 → 2.724 → 2.390**. Each update moves m and b opposite to the gradient, which is the downhill direction of the error. The drops get smaller (54.2, then 4.1, then 0.3) as we approach the minimum, where the slope is flatter.
 
 ## Part 4: Gradient descent in code
 
